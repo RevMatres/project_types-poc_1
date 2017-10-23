@@ -53,7 +53,6 @@ function recordPoints(){
   }, interval)
 }
 
-
 function endStroke(){
   // to stop recording points, stop the Interval in which points are added
   clearInterval(strokeIntervalId)
