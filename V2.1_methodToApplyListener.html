@@ -28,9 +28,8 @@
         // this.canvas.addEventListener('mousemove', this.getPointer)
       }
       getPointer(event){
-        let c = this.canvas.getBoundingClientRect()
-        this.pointerX = event.pageX - c.left
-        this.pointerY = event.pageY - c.top
+        this.pointerX = event.pageX - this.canvas.offsetLeft
+        this.pointerY = event.pageY - this.canvas.offsetTop
         this.draw()
       }
       draw(){
