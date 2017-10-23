@@ -22,25 +22,30 @@
         this.canvas.width = 500
       }
       addListener(){
-        this.canvas.addEventListener('mousemove', this.draw)
+        this.canvas.addEventListener('mousemove', ev => {
+          this.getPointer(ev)
+        })
+        // this.canvas.addEventListener('mousemove', this.getPointer)
       }
-      draw(event){
-        let x = event.pageX - this.offsetLeft
-        let y = event.pageY - this.offsetTop
-        console.log(event)
-
+      getPointer(event){
+        let c = this.canvas.getBoundingClientRect()
+        this.pointerX = event.pageX - c.left
+        this.pointerY = event.pageY - c.top
+        this.draw()
+      }
+      draw(){
+        this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height)
+        this.ctx.beginPath()
+        this.ctx.fillStyle = "rgba(250,0,0,0.25)"
+        this.ctx.arc(this.pointerX, this.pointerY, 8, 0, 2*Math.PI)
+        this.ctx.fill()
+        this.ctx.closePath()
+      }
                                                                                 // draw is called on the MouseEvent Object, in addListener()
                                                                                 // I should be able to bind the drawing methods to the correct object though
 
                                                                                 // also: FIGURE OUT WHAT THE HECK IS EVEN HAPPENING IN THERE, REGARDING THE THIS KEYWORD
 
-        // this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height)
-        // this.ctx.beginPath()
-        // this.ctx.fillStyle = "rgba(250,0,0,0.25)"
-        // this.ctx.arc(pointerX, pointerY, 8, 0, 2*Math.PI)
-        // this.ctx.fill()
-        // this.ctx.closePath()
-      }
     }
 
     let c1 = new Canvas('c1')
