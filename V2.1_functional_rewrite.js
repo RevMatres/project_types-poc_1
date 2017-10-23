@@ -39,11 +39,6 @@ function beginStroke(){
   recordPoints()
 }
 
-function endStroke(){
-  // to stop recording points, stop the Interval in which points are added
-  clearInterval(strokeIntervalId)
-}
-
 function recordPoints(){
   // set Interval to add points in
   strokeIntervalId = setInterval(() => {
@@ -58,6 +53,11 @@ function recordPoints(){
   }, interval)
 }
 
+
+function endStroke(){
+  // to stop recording points, stop the Interval in which points are added
+  clearInterval(strokeIntervalId)
+}
 function addPoint(){
   pointBuffer.push(
     new Point(pointerX, pointerY)
@@ -67,6 +67,7 @@ function addPoint(){
 function drawPoint(){
   let lastPoint = pointBuffer[pointBuffer.length-1]
 
+  // draw the point on the canvas
   ctx.beginPath()
   ctx.fillStyle = "rgba(0,0,0,0.1)"
   ctx.arc(lastPoint.x, lastPoint.y, 10, 0, 2*Math.PI)
@@ -79,6 +80,7 @@ function drawLine(){
   let lastPoint = pointBuffer[pointBuffer.length-1]
   let secondLastPoint = pointBuffer[pointBuffer.length-2]
 
+  // draw the line on the canvas
   ctx.beginPath()
   ctx.moveTo(secondLastPoint.x, secondLastPoint.y)
   ctx.lineTo(lastPoint.x, lastPoint.y)
