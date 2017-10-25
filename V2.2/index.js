@@ -95,6 +95,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 let canvas1 = new __WEBPACK_IMPORTED_MODULE_0__canvas_js__["a" /* Canvas */]("c1", 500, 500, 100)
 let canvas2 = new __WEBPACK_IMPORTED_MODULE_0__canvas_js__["a" /* Canvas */]("c2", 500, 500, 10)
 let canvas3 = new __WEBPACK_IMPORTED_MODULE_0__canvas_js__["a" /* Canvas */]("c3", 500, 500, 1)
+let canvas4 = new __WEBPACK_IMPORTED_MODULE_0__canvas_js__["a" /* Canvas */]("c4", window.innerHeight, window.innerWidth, 1)
 
 
 /***/ }),
