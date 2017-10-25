@@ -12,13 +12,6 @@
 //  Define Classes
 //
 
-class Point {
-  constructor(x, y){
-    this.x = x
-    this.y = y
-  }
-}
-
 class Canvas {
 
   constructor(id, height, width, updateInterval){

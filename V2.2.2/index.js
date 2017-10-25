@@ -118,13 +118,6 @@ let canvas4 = new __WEBPACK_IMPORTED_MODULE_0__canvas_js__["a" /* Canvas */]("c4
 //  Define Classes
 //
 
-class Point {
-  constructor(x, y){
-    this.x = x
-    this.y = y
-  }
-}
-
 class Canvas {
 
   constructor(id, height, width, updateInterval){
