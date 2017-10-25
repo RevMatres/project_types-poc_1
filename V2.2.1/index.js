@@ -106,45 +106,106 @@ let canvas3 = new __WEBPACK_IMPORTED_MODULE_0__drawingCanvas_js__["a" /* drawing
 let canvas4 = new __WEBPACK_IMPORTED_MODULE_0__drawingCanvas_js__["a" /* drawingCanvas */]("c4", window.innerHeight, window.innerWidth, 1)
 let bezierTestCanvas = new __WEBPACK_IMPORTED_MODULE_0__drawingCanvas_js__["a" /* drawingCanvas */]("c5", 500, 500, 1)
 
-let unit = 50
+// Canvas is in pixels, this is a pixel scaling factor
+let unit = 30
 
-let points = [
+let points1 = [
   new __WEBPACK_IMPORTED_MODULE_1__bezier_js__["a" /* bezierPoint */](1*unit,1*-unit),
   new __WEBPACK_IMPORTED_MODULE_1__bezier_js__["a" /* bezierPoint */](2*unit,4*-unit),
   new __WEBPACK_IMPORTED_MODULE_1__bezier_js__["a" /* bezierPoint */](6*unit,4*-unit),
   new __WEBPACK_IMPORTED_MODULE_1__bezier_js__["a" /* bezierPoint */](7*unit,1*-unit)
 ]
 
-points[0].run([points[0],points[1]])
-points[1].run([points[0],points[2]])
-points[2].run([points[1],points[3]])
-points[3].run([points[2], null])
-
-/*
- * WRITE A MARKDOWN FILE ON THE BEZIER.JS API
- */
+points1[0].run([null, points1[1]])
+points1[1].run([points1[0],points1[2]])
+points1[2].run([points1[1],points1[3]])
+points1[3].run([points1[2], null])
 
 bezierTestCanvas.ctx.beginPath()
 bezierTestCanvas.ctx.translate(0, bezierTestCanvas.canvas.height)
-bezierTestCanvas.ctx.moveTo(points[0].x, points[0].y)
+bezierTestCanvas.ctx.moveTo(points1[0].x, points1[0].y)
 bezierTestCanvas.ctx.bezierCurveTo(
-  points[0].cp2.x, points[0].cp2.y,
-  points[1].cp1.x, points[1].cp1.y,
-  points[1].x, points[1].y
+  points1[0].cp2.x, points1[0].cp2.y,
+  points1[1].cp1.x, points1[1].cp1.y,
+  points1[1].x, points1[1].y
 )
 bezierTestCanvas.ctx.bezierCurveTo(
-  points[1].cp2.x, points[1].cp2.y,
-  points[2].cp1.x, points[2].cp1.y,
-  points[2].x, points[2].y
+  points1[1].cp2.x, points1[1].cp2.y,
+  points1[2].cp1.x, points1[2].cp1.y,
+  points1[2].x, points1[2].y
 )
 bezierTestCanvas.ctx.bezierCurveTo(
-  points[2].cp2.x, points[2].cp2.y,
-  points[3].cp1.x, points[3].cp1.y,
-  points[3].x, points[3].y
+  points1[2].cp2.x, points1[2].cp2.y,
+  points1[3].cp1.x, points1[3].cp1.y,
+  points1[3].x, points1[3].y
 )
 bezierTestCanvas.ctx.lineWidth = 15
 bezierTestCanvas.ctx.stroke()
 bezierTestCanvas.ctx.closePath()
+
+// =============================================================================
+
+
+
+let points2 = [
+  new __WEBPACK_IMPORTED_MODULE_1__bezier_js__["a" /* bezierPoint */](9*unit,1*-unit),
+  new __WEBPACK_IMPORTED_MODULE_1__bezier_js__["a" /* bezierPoint */](13*unit,1*-unit)
+]
+let p1 = new __WEBPACK_IMPORTED_MODULE_1__bezier_js__["b" /* simplePoint */](9*unit,-50*-unit)
+let p2 = new __WEBPACK_IMPORTED_MODULE_1__bezier_js__["b" /* simplePoint */](13*unit,-50*-unit)
+points2[0].run([p1, points2[1]])
+points2[1].run([points2[0], p2])
+
+bezierTestCanvas.ctx.beginPath()
+bezierTestCanvas.ctx.moveTo(points2[0].x, points2[0].y)
+// bezierTestCanvas.ctx.lineTo(points2[1].x, points2[1].y)
+
+bezierTestCanvas.ctx.moveTo(points2[0].x, points2[0].y)
+bezierTestCanvas.ctx.bezierCurveTo(
+  points2[0].cp2.x, points2[0].cp2.y,
+  points2[1].cp1.x, points2[1].cp1.y,
+  points2[1].x, points2[1].y
+)
+bezierTestCanvas.ctx.lineWidth = 15
+bezierTestCanvas.ctx.stroke()
+bezierTestCanvas.ctx.closePath()
+
+/*
+ * WRITE A MARKDOWN FILE ON THE BEZIER.JS API
+ *
+ * DONE  change: make bezierPoint objects aren't used anywhere within a bezierPoint object ==> check the Line() creation!
+ * DONE  add: type destinction between simplePoint and bezierPoint
+ *
+ * add feature: custom pathEnd pseudo points with default being on the pathEnd Point
+ *  point.run([pseudoHandler(x, y), neighbour])
+ *    pseudoHandler(x, y) returns a simplePoint with a custom flag: returnedObject.nullPoint = true
+ *    checkNullPoint() then needs to check both for just null, and for obj.nullPoint == true
+ *
+ * add feature: create a bezierPointsArray prototype thingie with a method to auto-run all points
+ *  let p1 = bezierPointsArray([points], false)
+ *  p1.run()
+ *  let p2 = new bezierPointsArray([points], true) // the true is for autoRun
+ * this can be done with a return function, maybe even with a class constructor that just returns the array, which is pretty pointless
+ *
+ * combine feature: bezierPointsArray() needs to also accept pseudoEndPoints
+ *  maybe let p3 = new bezierPointsArray([bezierPoints], autoRun, [beginningPseudoPoint || null, endPseudoPoint || null])
+ *
+ * add feature: [points] creator function
+ *  takes an array like [{x:number,y:number},{x:number,y:number},{x:number,y:number}] and makes bezierPoints from it
+ *  which are acceptable in bezierPointsArray
+ *
+ * add feature: have bezierPointsArray() accept either an array with bezierPoint objects or an array of {x,y} objects and convert on its own
+ *  this requires type destinction between simplePoint and bezierPoint
+ *  don't allow for mixed arrays
+ *
+ * make function to draw on canvas
+ *    drawBezierCurve(canvasContext, [bezierPoints], {canvasSettings})
+ *
+ *      canvasSettings{
+ *        may include canvas translation that is undone when the function finishes
+ *        may include all of the styling attributes
+ *      }
+ */
 
 
 /***/ }),
@@ -405,6 +466,7 @@ function lastPointIndex(){
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return bezierPoint; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return simplePoint; });
 
 /**
  *
@@ -419,28 +481,40 @@ function lastPointIndex(){
  *  Class definitions
  */
 
-// defines a bezier-able point
-class bezierPoint {
+// defines a simple point object
+class simplePoint {
   constructor(x, y){
-    this.type = "point"
+    this.type = "simplePoint"
     this.x = x
     this.y = y
   }
+}
+
+// defines a bezier-able point
+class bezierPoint extends simplePoint{
+  // produce the controlPoints
   run(neighbours, bezierSmoothingStrength=1){
+    this.bindMethods()
     this.setNeighbours(neighbours)
     this.calcTangent()
     this.calcControlPoints(bezierSmoothingStrength)
   }
-  setNeighbours(neighbours){
-    this.neighbours = neighbours
 
-    // check for path ends which only have one neighbour
-    if(this.neighbours[0] == null){
-      this.neighbours[0] = this
-    }else if(this.neighbours[1] == null){
-      this.neighbours[1] = this
-    }
+  bindMethods(){
+    this.type = "bezierPoint"
+    this.checkPathBeginning = checkNullPoint.bind(this, 0)
+    this.checkPathEnd = checkNullPoint.bind(this, 1)
   }
+
+  setNeighbours(neighbours){
+    // make neighbour points
+    // check if they are endpoints, return simplePoint objects with neighbour's coordinates
+    let prev = this.checkPathBeginning(neighbours)
+    let next = this.checkPathEnd(neighbours)
+
+    this.neighbours = [prev, next]
+  }
+
   calcTangent(){
     // create a vector in the tangent's direction
     let tangentVector = new Vector(this.neighbours[0], this.neighbours[1])
@@ -449,7 +523,8 @@ class bezierPoint {
     // create tangent Line object
     this.tangent = new Line(this, tangentVector)
   }
-  calcControlPoints(bezierSmoothingStrength){
+
+  calcControlPoints(bezierSmoothingStrength=1){
     this.bezierSmoothingStrength = bezierSmoothingStrength
 
     this.cp1 = this.controlPoint(this.neighbours[0], this.neighbours[1])
@@ -472,7 +547,7 @@ class bezierPoint {
     segment.scalarProduct(this.bezierSmoothingStrength)
 
     // define P2half as P2'halfway
-    let P2half = new bezierPoint(this.x - segment.x, this.y - segment.y)
+    let P2half = new simplePoint(this.x - segment.x, this.y - segment.y)
 
     // line from P1 to P2half=P2'halfway
     let P1toP2half = new Line(P1, P2half)
@@ -500,13 +575,16 @@ class Vector {
     this.x = point2.x - point1.x
     this.y = point2.y - point1.y
   }
+
   length(){
     return Math.sqrt( Math.pow(this.x, 2) + Math.pow(this.y, 2) )
   }
+
   toUnitVector(){
     this.x /= this.length()
     this.y /= this.length()
   }
+
   scalarProduct(factor){
     this.x *= factor
     this.y *= factor
@@ -527,7 +605,7 @@ class Line{
       this.PV(a, b)
 
     // case: Line(Point, Point)
-    }else if(b.type == "point"){
+  }else if(b.type == "simplePoint" || b.type == "bezierPoint"){
       this.PP(a, b)
     }
   }
@@ -558,7 +636,7 @@ function lineIntersection(line1, line2){
   let y = line1.f(x)
 
   // return a point with x and y ROUNDED to 2 decimals
-  return new bezierPoint(Math.round(x*100)/100, Math.round(y*100)/100)
+  return new simplePoint(Math.round(x*100)/100, Math.round(y*100)/100)
 }
 
 // return the slope of obj
@@ -571,6 +649,15 @@ function slope(obj){
 // obj can be either a Vector or a Point
 function yIntersect(obj, slope){
   return obj.y - slope * obj.x
+}
+
+// check obj[ind] for null
+// return simplePoint that is either obj[ind] or a replacement for obj[ind]=null
+//  obj is an array with points
+//  ind is the index to be checked
+function checkNullPoint(ind, obj){
+  if(obj[ind] === null){ return new simplePoint(this.x, this.y) }
+  return new simplePoint(obj[ind].x, obj[ind].y)
 }
 
 // =============================================================================

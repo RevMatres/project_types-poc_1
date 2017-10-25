@@ -12,28 +12,40 @@
  *  Class definitions
  */
 
-// defines a bezier-able point
-class bezierPoint {
+// defines a simple point object
+class simplePoint {
   constructor(x, y){
-    this.type = "point"
+    this.type = "simplePoint"
     this.x = x
     this.y = y
   }
+}
+
+// defines a bezier-able point
+class bezierPoint extends simplePoint{
+  // produce the controlPoints
   run(neighbours, bezierSmoothingStrength=1){
+    this.bindMethods()
     this.setNeighbours(neighbours)
     this.calcTangent()
     this.calcControlPoints(bezierSmoothingStrength)
   }
-  setNeighbours(neighbours){
-    this.neighbours = neighbours
 
-    // check for path ends which only have one neighbour
-    if(this.neighbours[0] == null){
-      this.neighbours[0] = this
-    }else if(this.neighbours[1] == null){
-      this.neighbours[1] = this
-    }
+  bindMethods(){
+    this.type = "bezierPoint"
+    this.checkPathBeginning = checkNullPoint.bind(this, 0)
+    this.checkPathEnd = checkNullPoint.bind(this, 1)
   }
+
+  setNeighbours(neighbours){
+    // make neighbour points
+    // check if they are endpoints, return simplePoint objects with neighbour's coordinates
+    let prev = this.checkPathBeginning(neighbours)
+    let next = this.checkPathEnd(neighbours)
+
+    this.neighbours = [prev, next]
+  }
+
   calcTangent(){
     // create a vector in the tangent's direction
     let tangentVector = new Vector(this.neighbours[0], this.neighbours[1])
@@ -42,7 +54,8 @@ class bezierPoint {
     // create tangent Line object
     this.tangent = new Line(this, tangentVector)
   }
-  calcControlPoints(bezierSmoothingStrength){
+
+  calcControlPoints(bezierSmoothingStrength=1){
     this.bezierSmoothingStrength = bezierSmoothingStrength
 
     this.cp1 = this.controlPoint(this.neighbours[0], this.neighbours[1])
@@ -65,7 +78,7 @@ class bezierPoint {
     segment.scalarProduct(this.bezierSmoothingStrength)
 
     // define P2half as P2'halfway
-    let P2half = new bezierPoint(this.x - segment.x, this.y - segment.y)
+    let P2half = new simplePoint(this.x - segment.x, this.y - segment.y)
 
     // line from P1 to P2half=P2'halfway
     let P1toP2half = new Line(P1, P2half)
@@ -93,13 +106,16 @@ class Vector {
     this.x = point2.x - point1.x
     this.y = point2.y - point1.y
   }
+
   length(){
     return Math.sqrt( Math.pow(this.x, 2) + Math.pow(this.y, 2) )
   }
+
   toUnitVector(){
     this.x /= this.length()
     this.y /= this.length()
   }
+
   scalarProduct(factor){
     this.x *= factor
     this.y *= factor
@@ -120,7 +136,7 @@ class Line{
       this.PV(a, b)
 
     // case: Line(Point, Point)
-    }else if(b.type == "point"){
+  }else if(b.type == "simplePoint" || b.type == "bezierPoint"){
       this.PP(a, b)
     }
   }
@@ -151,7 +167,7 @@ function lineIntersection(line1, line2){
   let y = line1.f(x)
 
   // return a point with x and y ROUNDED to 2 decimals
-  return new bezierPoint(Math.round(x*100)/100, Math.round(y*100)/100)
+  return new simplePoint(Math.round(x*100)/100, Math.round(y*100)/100)
 }
 
 // return the slope of obj
@@ -166,13 +182,22 @@ function yIntersect(obj, slope){
   return obj.y - slope * obj.x
 }
 
+// check obj[ind] for null
+// return simplePoint that is either obj[ind] or a replacement for obj[ind]=null
+//  obj is an array with points
+//  ind is the index to be checked
+function checkNullPoint(ind, obj){
+  if(obj[ind] === null){ return new simplePoint(this.x, this.y) }
+  return new simplePoint(obj[ind].x, obj[ind].y)
+}
+
 // =============================================================================
 
 /*
  *  Exports
  */
 
-export { bezierPoint }
+export { bezierPoint, simplePoint }
 
 // =============================================================================
 
