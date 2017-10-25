@@ -201,17 +201,14 @@ function beginStroke(){
   // add stroke's first Point to buffer
   this.lastPoint = new Point(this.pointerX, this.pointerY)
 
-  // move to beginning of stroke,
-  // to avoid the stroke being connected to a previous stroke
-
-
   // set Interval to add points in
   this.strokeIntervalId = setInterval(() => {
     // if change in position occured
     if(this.lastPoint.x != this.pointerX || this.lastPoint.y != this.pointerY){
+      // draw line from lastPoint to the new position
       this.drawLine()
 
-      // record new position
+      // put new position in lastPoint
       this.lastPoint = new Point(this.pointerX, this.pointerY)
     }
   }, this.interval)
@@ -235,8 +232,14 @@ function drawLine(){
   this.ctx.lineCap = "butt"
   this.ctx.strokeStyle = "rgba(0,0,0,0.1)"
 
-  // move to last position
+  // move to lastPoint
   this.ctx.moveTo(this.lastPoint.x, this.lastPoint.y)
+  /**
+    * This needs to be done manually, because the path is limited to drawLine()
+    * If the path isn't limited to drawLine(), the path contains the whole stroke.
+    * That leads to mistakes with the stroke
+   **/
+
   // draw a line to new position
   this.ctx.lineTo(this.pointerX, this.pointerY)
   this.ctx.stroke()
