@@ -1,8 +1,8 @@
 
 //
 //
-//    CANVAS.JS
-//    contains the Canvas Class
+//    DRAWINGCANVAS.JS
+//    contains the drawingCanvas Class
 //
 //
 
@@ -19,7 +19,7 @@ class Point {
   }
 }
 
-class Canvas {
+class drawingCanvas {
 
   constructor(id, height, width, updateInterval){
     this.addVariables(id, updateInterval)
@@ -31,7 +31,7 @@ class Canvas {
     this.addEventListeners()
   }
 
-  // defines and initialises required properties of the Canvas class
+  // defines and initialises required properties of the drawingCanvas class
   addVariables(id, updateInterval){
     this.pointerX
     this.pointerY
@@ -44,7 +44,7 @@ class Canvas {
     this.ctx = this.canvas.getContext("2d")
   }
 
-  // binds all required methods to the Canvas class
+  // binds all required methods to the drawingCanvas class
   bindMethods(){
     this.setStyles = setStyles.bind(this)
     this.addEventListeners = addEventListeners.bind(this)
@@ -241,4 +241,4 @@ function lastPointIndex(){
 //  Exports
 //
 
-export { Canvas }
+export { drawingCanvas }
