@@ -35,6 +35,7 @@ class Canvas {
   addVariables(id, updateInterval){
     this.pointerX
     this.pointerY
+    this.lastPoint
     this.strokeIntervalId
     this.interval = updateInterval
 
@@ -50,7 +51,6 @@ class Canvas {
     this.getPointerPosition = getPointerPosition.bind(this)
     this.beginStroke = beginStroke.bind(this)
     this.endStroke = endStroke.bind(this)
-    this.drawPoint = drawPoint.bind(this)
     this.drawLine = drawLine.bind(this)
   }
 
@@ -92,11 +92,22 @@ function getPointerPosition(event){
 }
 
 function beginStroke(){
-  // this.drawPoint()
+  // add stroke's first Point to buffer
+  this.lastPoint = new Point(this.pointerX, this.pointerY)
+
+  // move to beginning of stroke,
+  // to avoid the stroke being connected to a previous stroke
+
+
   // set Interval to add points in
   this.strokeIntervalId = setInterval(() => {
-    this.drawLine()
-    // this.drawPoint()
+    // if change in position occured
+    if(this.lastPoint.x != this.pointerX || this.lastPoint.y != this.pointerY){
+      this.drawLine()
+
+      // record new position
+      this.lastPoint = new Point(this.pointerX, this.pointerY)
+    }
   }, this.interval)
 }
 
@@ -111,41 +122,21 @@ function endStroke(){
 //  Canvas drawing Functions
 //
 
-function drawPoint(){
-  this.ctx.beginPath()
-  this.ctx.fillStyle = "rgba(0,0,0,0.1)"
-  this.ctx.arc(this.pointerX, this.pointerY, 10, 0, 2*Math.PI)
-  this.ctx.fill()
-  this.ctx.stroke()
-  this.ctx.closePath()
-}
-
 function drawLine(){
+  this.ctx.beginPath()
+  // set styles
+  this.ctx.lineWidth = 10
+  this.ctx.lineCap = "butt"
+  this.ctx.strokeStyle = "rgba(0,0,0,0.1)"
+
+  // move to last position
+  this.ctx.moveTo(this.lastPoint.x, this.lastPoint.y)
+  // draw a line to new position
   this.ctx.lineTo(this.pointerX, this.pointerY)
   this.ctx.stroke()
+  this.ctx.closePath()
+
 }
-
-// =============================================================================
-
-//
-//  Helpers
-//
-
-// returns index of last Point in pointBuffer
-function lastPointIndex(){
-  return this.pointBuffer.length-1
-}
-/**
-* Purpose of lastPointIndex():
-*  drawPoint() and drawStroke() always need to use the last two Points
-*  in pointBuffer.
-*   If there are only two Points in pointBuffer they need to use
-*   the Points [0] and [1]. If the buffer is full, they need to use
-*   the Points [1] and [2].
-*
-*  By using the Points [lastPointIndex()] and [lastPointIndex()-1] the functions
-*  get the right Points independently from pointBuffer's length.
-**/
 
 // =============================================================================
 
