@@ -141,7 +141,6 @@ class Canvas {
   addVariables(id, updateInterval){
     this.pointerX
     this.pointerY
-    this.pointBuffer = []
     this.strokeIntervalId
     this.interval = updateInterval
 
@@ -156,12 +155,9 @@ class Canvas {
     this.addEventListeners = addEventListeners.bind(this)
     this.getPointerPosition = getPointerPosition.bind(this)
     this.beginStroke = beginStroke.bind(this)
-    this.recordPoints = recordPoints.bind(this)
     this.endStroke = endStroke.bind(this)
-    this.addPoint = addPoint.bind(this)
     this.drawPoint = drawPoint.bind(this)
     this.drawLine = drawLine.bind(this)
-    this.lastPointIndex = lastPointIndex.bind(this)
   }
 
 }
@@ -202,84 +198,17 @@ function getPointerPosition(event){
 }
 
 function beginStroke(){
-  // add first point of the stroke
-  this.addPoint(0)
-  this.drawPoint(0)
-
-  this.recordPoints()
-}
-
-function recordPoints(){
+  // this.drawPoint()
   // set Interval to add points in
   this.strokeIntervalId = setInterval(() => {
-    let lastPoint = this.pointBuffer[this.pointBuffer.length-1]
-
-    // check if pointer position has changed
-    if(this.pointerX != lastPoint.x || this.pointerY != lastPoint.y){
-      this.addPoint()
-      this.drawPoint()
-      this.drawLine()
-    }
+    this.drawLine()
+    // this.drawPoint()
   }, this.interval)
 }
 
 function endStroke(){
-  // clear pointBuffer
-  this.pointBuffer = []
-
   // to stop recording points, stop the Interval in which points are added
   clearInterval(this.strokeIntervalId)
-}
-
-function addPoint(optionalIndex = false){
-
-  // handle custom index
-  if(optionalIndex !== false){
-    this.pointBuffer[optionalIndex] = new Point(this.pointerX, this.pointerY)
-
-    // to avoid adding Points twice accidentally
-    return
-  }
-
-  switch(this.pointBuffer.length){
-    // one Point in buffer: only the stroke's first Point has been added
-    case 1:
-      // add second Point
-      this.pointBuffer.push(new Point(this.pointerX, this.pointerY))
-      break
-    // two Points in buffer: only the first two Points have been added
-    case 2:
-      // add third Point
-      this.pointBuffer.push(new Point(this.pointerX, this.pointerY))
-      break
-    // three Points in buffer: the buffer is full
-    case 3:
-      this.pointBuffer[0] = this.pointBuffer[1]
-      this.pointBuffer[1] = this.pointBuffer[2]
-      this.pointBuffer[2] = new Point(this.pointerX, this.pointerY)
-      break
-  }
-
-  /**   EXPLANATION FOR CASE 3
-   *
-   * The buffer works as follows:
-   *  [ oldestPoint, middlePoint, newestPoint ]
-   *  [          p1,          p2,          p3 ]
-   *
-   * How p4 is added:
-   *    p1 is removed, p2 is moved to [0]
-   *  [          p2,          p2,          p3 ]
-   *    p3 is moved to [1]
-   *  [          p2,          p3,          p3 ]
-   *    p4 is added
-   *  [          p2,          p3,          p4 ]
-   *
-   * New state compared to old state:
-   *  [          p2,          p3,          p4 ] new
-   *  [          p1,          p2,          p3 ] old
-   *
-  **/
-
 }
 
 // =============================================================================
@@ -288,35 +217,18 @@ function addPoint(optionalIndex = false){
 //  Canvas drawing Functions
 //
 
-function drawPoint(pointIndex = false){
-  // last Point in pointBuffer depending on pointBuffer's length
-  let lastPoint = this.pointBuffer[this.lastPointIndex()]
-
-  // handle custom point index
-  if(pointIndex !== false){
-    lastPoint = this.pointBuffer[pointIndex]
-  }
-
-  // draw the point on the canvas
+function drawPoint(){
   this.ctx.beginPath()
   this.ctx.fillStyle = "rgba(0,0,0,0.1)"
-  this.ctx.arc(lastPoint.x, lastPoint.y, 10, 0, 2*Math.PI)
+  this.ctx.arc(this.pointerX, this.pointerY, 10, 0, 2*Math.PI)
   this.ctx.fill()
   this.ctx.stroke()
   this.ctx.closePath()
 }
 
 function drawLine(){
-  // last two Points in pointBuffer depending on pointBuffer's length
-  let lastPoint = this.pointBuffer[this.lastPointIndex()]
-  let secondLastPoint = this.pointBuffer[this.lastPointIndex()-1]
-
-  // draw the line on the canvas
-  this.ctx.beginPath()
-  this.ctx.moveTo(secondLastPoint.x, secondLastPoint.y)
-  this.ctx.lineTo(lastPoint.x, lastPoint.y)
+  this.ctx.lineTo(this.pointerX, this.pointerY)
   this.ctx.stroke()
-  this.ctx.closePath()
 }
 
 // =============================================================================
