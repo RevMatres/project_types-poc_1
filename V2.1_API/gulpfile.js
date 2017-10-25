@@ -40,6 +40,6 @@ gulp.task('webpack', function(){
 })
 
 // watch tasks
-gulp.watch('../modules/**.js', function(){
+gulp.watch('./modules/**.js', function(){
   gulp.start('webpack')
 })
