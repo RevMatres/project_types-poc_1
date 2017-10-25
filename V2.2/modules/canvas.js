@@ -55,6 +55,7 @@ class Canvas {
     this.addPoint = addPoint.bind(this)
     this.drawPoint = drawPoint.bind(this)
     this.drawLine = drawLine.bind(this)
+    this.lastPointIndex = lastPointIndex.bind(this)
   }
 
 }
@@ -96,8 +97,8 @@ function getPointerPosition(event){
 
 function beginStroke(){
   // add first point of the stroke
-  this.addPoint()
-  this.drawPoint()
+  this.addPoint(0)
+  this.drawPoint(0)
 
   this.recordPoints()
 }
@@ -117,14 +118,62 @@ function recordPoints(){
 }
 
 function endStroke(){
+  // clear pointBuffer
+  this.pointBuffer = []
+
   // to stop recording points, stop the Interval in which points are added
   clearInterval(this.strokeIntervalId)
 }
 
-function addPoint(){
-  this.pointBuffer.push(
-    new Point(this.pointerX, this.pointerY)
-  )
+function addPoint(optionalIndex = false){
+
+  // handle custom index
+  if(optionalIndex !== false){
+    this.pointBuffer[optionalIndex] = new Point(this.pointerX, this.pointerY)
+
+    // to avoid adding Points twice accidentally
+    return
+  }
+
+  switch(this.pointBuffer.length){
+    // one Point in buffer: only the stroke's first Point has been added
+    case 1:
+      // add second Point
+      this.pointBuffer.push(new Point(this.pointerX, this.pointerY))
+      break
+    // two Points in buffer: only the first two Points have been added
+    case 2:
+      // add third Point
+      this.pointBuffer.push(new Point(this.pointerX, this.pointerY))
+      break
+    // three Points in buffer: the buffer is full
+    case 3:
+      this.pointBuffer[0] = this.pointBuffer[1]
+      this.pointBuffer[1] = this.pointBuffer[2]
+      this.pointBuffer[2] = new Point(this.pointerX, this.pointerY)
+      break
+  }
+
+  /**   EXPLANATION FOR CASE 3
+   *
+   * The buffer works as follows:
+   *  [ oldestPoint, middlePoint, newestPoint ]
+   *  [          p1,          p2,          p3 ]
+   *
+   * How p4 is added:
+   *    p1 is removed, p2 is moved to [0]
+   *  [          p2,          p2,          p3 ]
+   *    p3 is moved to [1]
+   *  [          p2,          p3,          p3 ]
+   *    p4 is added
+   *  [          p2,          p3,          p4 ]
+   *
+   * New state compared to old state:
+   *  [          p2,          p3,          p4 ] new
+   *  [          p1,          p2,          p3 ] old
+   *
+  **/
+
 }
 
 // =============================================================================
@@ -133,8 +182,14 @@ function addPoint(){
 //  Canvas drawing Functions
 //
 
-function drawPoint(){
-  let lastPoint = this.pointBuffer[this.pointBuffer.length-1]
+function drawPoint(pointIndex = false){
+  // last Point in pointBuffer depending on pointBuffer's length
+  let lastPoint = this.pointBuffer[this.lastPointIndex()]
+
+  // handle custom point index
+  if(pointIndex !== false){
+    lastPoint = this.pointBuffer[pointIndex]
+  }
 
   // draw the point on the canvas
   this.ctx.beginPath()
@@ -146,8 +201,9 @@ function drawPoint(){
 }
 
 function drawLine(){
-  let lastPoint = this.pointBuffer[this.pointBuffer.length-1]
-  let secondLastPoint = this.pointBuffer[this.pointBuffer.length-2]
+  // last two Points in pointBuffer depending on pointBuffer's length
+  let lastPoint = this.pointBuffer[this.lastPointIndex()]
+  let secondLastPoint = this.pointBuffer[this.lastPointIndex()-1]
 
   // draw the line on the canvas
   this.ctx.beginPath()
@@ -156,6 +212,28 @@ function drawLine(){
   this.ctx.stroke()
   this.ctx.closePath()
 }
+
+// =============================================================================
+
+//
+//  Helpers
+//
+
+// returns index of last Point in pointBuffer
+function lastPointIndex(){
+  return this.pointBuffer.length-1
+}
+/**
+* Purpose of lastPointIndex():
+*  drawPoint() and drawStroke() always need to use the last two Points
+*  in pointBuffer.
+*   If there are only two Points in pointBuffer they need to use
+*   the Points [0] and [1]. If the buffer is full, they need to use
+*   the Points [1] and [2].
+*
+*  By using the Points [lastPointIndex()] and [lastPointIndex()-1] the functions
+*  get the right Points independently from pointBuffer's length.
+**/
 
 // =============================================================================
 
