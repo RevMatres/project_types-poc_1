@@ -121,28 +121,6 @@ function drawLine(){
 // =============================================================================
 
 //
-//  Helpers
-//
-
-// returns index of last Point in pointBuffer
-function lastPointIndex(){
-  return this.pointBuffer.length-1
-}
-/**
-* Purpose of lastPointIndex():
-*  drawPoint() and drawStroke() always need to use the last two Points
-*  in pointBuffer.
-*   If there are only two Points in pointBuffer they need to use
-*   the Points [0] and [1]. If the buffer is full, they need to use
-*   the Points [1] and [2].
-*
-*  By using the Points [lastPointIndex()] and [lastPointIndex()-1] the functions
-*  get the right Points independently from pointBuffer's length.
-**/
-
-// =============================================================================
-
-//
 //  Exports
 //
 
